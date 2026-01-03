@@ -189,8 +189,18 @@ function formatDate(date) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const m = month - 1;
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let count = 0;
+
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const d = new Date(year, m, day);
+    const dayOfWeek = d.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) count += 1;
+  }
+
+  return count;
 }
 
 /**
@@ -206,10 +216,23 @@ function getCountWeekendsInMonth(/* month, year */) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
-}
+function getWeekNumberByDate(date) {
+  if (!(date instanceof Date)) throw new Error('Invalid date');
 
+  const d = new Date(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+  );
+
+  const dayNum = d.getUTCDay() === 0 ? 7 : d.getUTCDay();
+
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+
+  const weekNo = Math.ceil((d - yearStart + 1) / 86400000 / 7);
+
+  return weekNo;
+}
 /**
  * Returns the date of the next Friday the 13th from a given date.
  * Friday the 13th is considered an unlucky day in some cultures.
@@ -221,8 +244,30 @@ function getWeekNumberByDate(/* date */) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  const d = new Date(date.getTime());
+  d.setHours(0, 0, 0, 0);
+
+  let year = d.getFullYear();
+  let month = d.getMonth();
+  let found = false;
+  let result;
+
+  while (!found) {
+    const thirteenth = new Date(year, month, 13);
+    if (thirteenth > d && thirteenth.getDay() === 5) {
+      result = thirteenth;
+      found = true;
+    } else {
+      month += 1;
+      if (month > 11) {
+        month = 0;
+        year += 1;
+      }
+    }
+  }
+
+  return result;
 }
 
 /**
