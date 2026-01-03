@@ -310,13 +310,15 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
   const [startDay, startMonth, startYear] = period.start.split('-').map(Number);
   const [endDay, endMonth, endYear] = period.end.split('-').map(Number);
 
-  let current = new Date(startYear, startMonth - 1, startDay);
+  const current = new Date(startYear, startMonth - 1, startDay);
   const end = new Date(endYear, endMonth - 1, endDay);
 
   while (current <= end) {
-    for (let i = 0; i < countWorkDays && current <= end; i++) {
-      const d = `${String(current.getDate()).padStart(2, '0')}-${String(current.getMonth()+1).padStart(2,'0')}-${current.getFullYear()}`;
-      result.push(d);
+    for (let i = 0; i < countWorkDays && current <= end; i += 1) {
+      const day = String(current.getDate()).padStart(2, '0');
+      const month = String(current.getMonth() + 1).padStart(2, '0');
+      const year = current.getFullYear();
+      result.push(`${day}-${month}-${year}`);
       current.setDate(current.getDate() + 1);
     }
     current.setDate(current.getDate() + countOffDays);
@@ -337,8 +339,10 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  if (!(date instanceof Date)) throw new Error('Invalid date');
+  const year = date.getFullYear();
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 }
 
 module.exports = {
